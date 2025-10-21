@@ -9,7 +9,7 @@ df['Order Date'] = pd.to_datetime(df['Order Date'])
 
 # === Inicializar app ===
 app = Dash(__name__)
-server = app.server  # Necesario si usas gunicorn en Render
+server = app.server  # 👈 Render necesita esta variable para gunicorn
 app.title = "Tablero Empresarial con Dash y Plotly"
 
 # === Estilos generales ===
@@ -37,7 +37,7 @@ app.layout = html.Div(
     },
     children=[
         html.H1(
-            " Tablero Empresarial - Superstore",
+            "Tablero Empresarial - Superstore",
             style={
                 'textAlign': 'center',
                 'color': '#2c3e50',
@@ -49,7 +49,7 @@ app.layout = html.Div(
         # --- FILTROS ---
         html.Div([
             html.Div([
-                html.Label(" Rango de tiempo", style={'fontWeight': 'bold'}),
+                html.Label("Rango de tiempo", style={'fontWeight': 'bold'}),
                 dcc.RadioItems(
                     id='time_filter',
                     options=[
@@ -65,7 +65,7 @@ app.layout = html.Div(
             ], style=CARD_STYLE),
 
             html.Div([
-                html.Label(" Región", style={'fontWeight': 'bold'}),
+                html.Label("Región", style={'fontWeight': 'bold'}),
                 dcc.Dropdown(
                     id='region_filter',
                     options=[{'label': r, 'value': r} for r in sorted(df['Region'].unique())] +
@@ -76,7 +76,7 @@ app.layout = html.Div(
             ], style={**CARD_STYLE, 'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
 
             html.Div([
-                html.Label(" Categoría de producto", style={'fontWeight': 'bold'}),
+                html.Label("Categoría de producto", style={'fontWeight': 'bold'}),
                 dcc.Dropdown(
                     id='category_filter',
                     options=[{'label': c, 'value': c} for c in sorted(df['Category'].unique())] +
@@ -100,7 +100,6 @@ app.layout = html.Div(
     ]
 )
 
-
 # === Funciones auxiliares ===
 def filter_by_time(df, period):
     max_date = df['Order Date'].max()
@@ -111,7 +110,6 @@ def filter_by_time(df, period):
     elif period == '1y':
         return df[df['Order Date'] >= (max_date - pd.DateOffset(years=1))]
     return df
-
 
 # === Callback principal ===
 @app.callback(
@@ -156,8 +154,6 @@ def update_graphs(period, region, category):
 
     return fig1, fig2, fig3, fig4
 
-
 # === Ejecutar servidor ===
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8050))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
